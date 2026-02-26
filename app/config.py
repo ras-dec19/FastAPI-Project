@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
+    direct_database_url: str | None = None
 
     class Config:
         env_file = ".env"

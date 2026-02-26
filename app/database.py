@@ -3,9 +3,16 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
 
+
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={"sslmode": "require"},
+)  # pool_pre_ping=True is used to check if the connection is alive before using it, which helps to avoid "Connection is closed" errors when the database connection is lost.
+
+# connect_args={"sslmode": "require"} is used to enforce SSL connection to the database, which is important for security when connecting to a remote database like Neon.  If you're connecting to a local database that doesn't require SSL, you can remove the connect_args parameter.
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

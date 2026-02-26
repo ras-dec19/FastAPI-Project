@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     direct_database_url: str | None = None
+    database_sslmode: str = "disable"  # Default value for local development
 
     class Config:
         env_file = ".env"

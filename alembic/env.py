@@ -9,10 +9,6 @@ from alembic import context
 from app.models import Base
 from app.config import settings
 
-# Optional: only needed if Alembic doesn't see your .env during local runs
-# from dotenv import load_dotenv
-# load_dotenv()
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

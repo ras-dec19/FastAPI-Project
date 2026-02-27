@@ -1,4 +1,5 @@
 from fastapi import status, HTTPException, Depends, APIRouter
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .. import models, schemas, utils
 from ..database import get_db
@@ -14,7 +15,15 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     new_user = models.User(**user.model_dump())
     db.add(new_user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        # With a UNIQUE(email) constraint in the DB, this is almost always duplicate email here.
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email is already registered.",
+        )
     db.refresh(new_user)
 
     return new_user

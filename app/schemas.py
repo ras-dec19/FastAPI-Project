@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal, Union
 from pydantic import BaseModel, EmailStr
 
-### Request models
+### Request models ###
 
 
 class PostBase(BaseModel):
@@ -52,7 +52,7 @@ class Vote(BaseModel):
     dir: Literal[0, 1]  # 0 for downvote, 1 for upvote
 
 
-### Response model
+### Response model ###
 
 
 class UserOut(BaseModel):

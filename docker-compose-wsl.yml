@@ -22,13 +22,11 @@ services:
     restart: unless-stopped
 
   api:
-    build: .
+    image: ${API_IMAGE:?API_IMAGE is not set}
     env_file:
       - ./.env
     ports:
       - "8001:8000"
-    volumes:
-      - ./:/usr/src/app:ro
     command:
       [
         "gunicorn",

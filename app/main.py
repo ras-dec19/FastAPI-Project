@@ -37,4 +37,4 @@ app.include_router(vote.router)
 
 @app.get("/", status_code=status.HTTP_200_OK)
 def root():
-    return {"Message": "Welcome to my api!!!"}
+    return {"Message": "Welcome to my api!!! :)"}

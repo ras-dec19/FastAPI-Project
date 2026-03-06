@@ -3,8 +3,6 @@ name: myapp-wsl
 services:
   postgres:
     image: postgres:16-bookworm
-    env_file:
-      - ./.env
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}

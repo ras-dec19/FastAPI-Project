@@ -3,8 +3,6 @@ name: myapp-dev
 services:
   postgres:
     image: postgres:16-bookworm
-    env_file:
-      - ./.env
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -23,14 +21,12 @@ services:
 
   api:
     build: .
-    env_file:
-      - ./.env
     environment:
       WATCHFILES_FORCE_POLLING: "true"
     ports:
       - "8000:8000"
     volumes:
-      - ./:/usr/src/app
+      - ./:/usr/src/app:ro
     command:
       [
         "uvicorn",

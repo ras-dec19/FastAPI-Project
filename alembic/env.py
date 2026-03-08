@@ -1,5 +1,4 @@
 from logging.config import fileConfig
-import os
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -13,20 +12,10 @@ from app.config import settings
 # access to the values within the .ini file in use.
 config = context.config
 
-#######################################################################################
-# Here we set up the database URL for Alembic. We have two options:
-# 1) Default / original URL (your existing setup)
-default_db_url = (
-    f"postgresql://{settings.database_username}:{settings.database_password}"
-    f"@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
-)
-
-# 2) Prefer Neon direct URL for migrations if provided
-db_url = os.getenv("DIRECT_DATABASE_URL") or default_db_url
-
-config.set_main_option("sqlalchemy.url", db_url)
-
-#######################################################################################
+############################################################################
+# Use the same DB URL logic as the app
+config.set_main_option("sqlalchemy.url", settings.migration_database_url)
+############################################################################
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

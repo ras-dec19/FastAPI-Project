@@ -1,19 +1,18 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
 
-
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
-
 ###################################################################################################
 connect_args = {}
-if settings.database_sslmode:  # "disable", "require", "verify-ca", "verify-full"
+
+# Only pass sslmode when not using a direct URL that already contains it
+if settings.database_sslmode:
     connect_args["sslmode"] = settings.database_sslmode
 
 ###################################################################################################
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
+    settings.app_database_url,
     pool_pre_ping=True,
     connect_args=connect_args,
 )  # pool_pre_ping=True is used to check if the connection is alive before using it, which helps to avoid "Connection is closed" errors when the database connection is lost.

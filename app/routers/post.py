@@ -21,12 +21,18 @@ def get_posts(
     # posts = db.query(models.Post).all()
 
     # To get only the posts of the current user, uncomment the line below and comment the line above
-    # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all()
+    # posts = (
+    #     db.query(models.Post)
+    #     .filter(models.Post.owner_id == current_user.id)
+    #     .order_by(models.Post.id)
+    #     .all()
+    # )
 
     # To get all the posts with a URL query parameters, uncomment the line below and comment the line above
     # posts = (
     #     db.query(models.Post)
     #     .filter(models.Post.title.contains(search))
+    #     .order_by(models.Post.id)
     #     .limit(limit)
     #     .offset(skip)
     #     .all()
@@ -37,6 +43,7 @@ def get_posts(
         .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
         .group_by(models.Post.id)
         .filter(models.Post.title.contains(search))
+        .order_by(models.Post.id)
         .limit(limit)
         .offset(skip)
         .all()
@@ -103,7 +110,7 @@ def delete_post(
     if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Post with is: {id} was not found",
+            detail=f"Post with id: {id} was not found",
         )
 
     if post.owner_id != current_user.id:

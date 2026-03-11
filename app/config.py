@@ -12,12 +12,12 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
-    # direct Neon connection, mainly for Alembic / migrations
-    direct_database_url: str | None = None
-
-    # for app/runtime connections
+    direct_database_url: str | None = None  # Optional override for direct database URL
     database_sslmode: str = (
-        "disable"  # default to disable for local development, but in production this should be set to "require" or "verify-full"
+        "disable"  # Optional SSL mode for database connection, default is "disable"
+    )
+    testing: bool = (
+        False  # Flag to indicate if the application is running in testing mode, default is False
     )
 
     model_config = SettingsConfigDict(
@@ -26,11 +26,15 @@ class Settings(BaseSettings):
     )
 
     @property
+    def resolved_database_name(self) -> str:
+        return f"{self.database_name}_test" if self.testing else self.database_name
+
+    @property
     def app_database_url(self) -> str:
         return (
             f"postgresql://{self.database_username}:"
             f"{self.database_password}@{self.database_hostname}:"
-            f"{self.database_port}/{self.database_name}"
+            f"{self.database_port}/{self.resolved_database_name}"
         )
 
     @property

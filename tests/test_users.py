@@ -5,7 +5,7 @@ def test_root(client):
     res = client.get("/")
 
     assert res.status_code == 200
-    assert res.json().get("Message") == "Welcome to my api!!"
+    assert res.json().get("Message") == "Welcome to my api!!!"
 
 
 def test_create_user(client, user_data):

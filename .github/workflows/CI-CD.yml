@@ -161,11 +161,26 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, linux, x64, ubuntu-wsl]
     environment:
-      name: ubuntu-server
+      name: tests
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+      - name: Create .env.docker for Ubuntu deploy
+        run: |
+          cat > .env.docker <<EOF
+          DATABASE_HOSTNAME=postgres
+          DATABASE_PORT=5432
+          DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+          DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          ALGORITHM=${{ secrets.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          POSTGRES_USER=${{ secrets.DATABASE_USERNAME }}
+          POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB=${{ secrets.DATABASE_NAME }}
+          EOF
 
       - name: Deploy on Ubuntu machine
         working-directory: ${{ github.workspace }}

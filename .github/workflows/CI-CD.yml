@@ -164,11 +164,13 @@ jobs:
       name: ubuntu-server
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
       - name: Deploy on Ubuntu machine
+        working-directory: ${{ github.workspace }}
         run: |
           set -euo pipefail
-          cd app/src
-          git pull --ff-only origin main
 
           docker compose -f docker-compose-wsl.yml up -d postgres
           docker compose -f docker-compose-wsl.yml pull api

@@ -159,19 +159,21 @@ jobs:
   deploy_ubuntu:
     needs: docker_wsl
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: [self-hosted, Linux]
+    runs-on: [self-hosted, linux, x64, ubuntu-wsl]
+    environment:
+      name: ubuntu-server
 
     steps:
-    - name: Deploy on local Ubuntu machine
-      run: |
-        set -euo pipefail
-        cd app/src
-        git pull --ff-only origin main
+      - name: Deploy on Ubuntu machine
+        run: |
+          set -euo pipefail
+          cd app/src
+          git pull --ff-only origin main
 
-        docker compose -f docker-compose-wsl.yml up -d postgres
-        docker compose -f docker-compose-wsl.yml pull api
-        docker compose -f docker-compose-wsl.yml run --rm --no-deps api alembic upgrade head
-        docker compose -f docker-compose-wsl.yml up -d --no-deps api
+          docker compose -f docker-compose-wsl.yml up -d postgres
+          docker compose -f docker-compose-wsl.yml pull api
+          docker compose -f docker-compose-wsl.yml run --rm --no-deps api alembic upgrade head
+          docker compose -f docker-compose-wsl.yml up -d --no-deps api
 
   # deploy_ubuntu:
   #   needs: docker_wsl

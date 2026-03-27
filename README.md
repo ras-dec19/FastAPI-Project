@@ -59,6 +59,7 @@ The configuration layer also supports:
 ### Example workflow
 
 - Run locally with the default local environment file:
+
   ```bash
   uvicorn app.main:app --reload
   ```
@@ -78,8 +79,7 @@ This keeps configuration:
 - **flexible**, by supporting local, Docker, test, and CI environments
 - **maintainable**, by avoiding repeated connection-string logic across the codebase
 
-The full implementation lives in `config.py`
----
+## The full implementation lives in `config.py`
 
 ## 2. Project structure
 
@@ -126,6 +126,7 @@ The project is organized as follows:
 ├── nginx.conf
 └── requirements.txt
 ```
+
 ---
 
 ## 3. Environment files
@@ -421,6 +422,7 @@ Keep the full Docker Compose definitions in `docker-compose-dev.yml` and `docker
 - which workflow is the default
 - how services communicate inside Docker
 - which host ports are exposed externally
+
 ---
 
 ## 9. Testing
@@ -499,6 +501,7 @@ The CI pipeline follows the same general pattern in GitHub Actions:
 - set `TESTING=true`
 - run Alembic migrations
 - execute the test suite with pytest
+
 ---
 
 ## 10. Alembic and migrations
@@ -563,7 +566,7 @@ This setup helps keep migrations:
 - flexible, because direct connection overrides remain available when required
 - easier to maintain, because connection string logic lives in one place
 
-```
+````
 
 ---
 
@@ -573,7 +576,7 @@ This setup helps keep migrations:
 
 ```bash
  docker image tag your-docker-image-name your-docker-hub-username/docker-hub-username:your-docker-image-name
-```
+````
 
 ### Log in to Docker Hub
 
@@ -583,7 +586,7 @@ docker login
 
 ### Push the image
 
-```bash  
+```bash
 docker push your-docker-hub-username/docker-hub-username:your-docker-image-name
 ```
 
@@ -672,11 +675,9 @@ bash -c "python -m alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 -
 
 If you run migrations against Neon, `DIRECT_DATABASE_URL` should point to the direct connection string.
 
-
-
 ## 13. Linux commands
 
-1) WSL commands
+1. WSL commands
 
 List available WSL distributions:
 
@@ -690,8 +691,7 @@ Open Ubuntu 24.04 as root:
 wsl -d Ubuntu-24.04 -u root
 ```
 
-
-2) systemd service commands
+2. systemd service commands
 
 Check service status:
 
@@ -711,8 +711,7 @@ Enable and start the service:
 sudo systemctl enable --now api.service
 ```
 
-
-3) SSH key setup for GitHub Actions deploy
+3. SSH key setup for GitHub Actions deploy
 
 If you do not already have an SSH key, generate one on your local machine
 (Linux, macOS, or WSL):
@@ -724,12 +723,12 @@ ssh-keygen -t ed25519 -C "github-actions-deploy"
 ```
 
 When prompted:
+
 - Press Enter to use the default file path
 - Press Enter for an empty passphrase
 - Press Enter again to confirm
 
-
-4) Show your SSH keys
+4. Show your SSH keys
 
 Private key:
 
@@ -744,11 +743,11 @@ cat ~/.ssh/id_ed25519.pub
 ```
 
 Use them like this:
+
 - Put the private key into the GitHub secret: PROD_SSH_PRIVATE_KEY
 - Put the public key into the Ubuntu server file: ~/.ssh/authorized_keys
 
-
-5) Add the public key to the Ubuntu server
+5. Add the public key to the Ubuntu server
 
 Step 1: Show your public key on your current machine
 
@@ -762,7 +761,6 @@ ssh-ed25519 <generated-key-data> github-actions-deploy
 
 Copy the entire line.
 
-
 Step 2: Connect to the Ubuntu server
 
 ```bash
@@ -770,7 +768,6 @@ ssh your_username@your_server_ip
 ```
 
 If this is your own PC, open its terminal directly.
-
 
 Step 3: Create the SSH folder and authorized_keys file on the Ubuntu server
 
@@ -782,11 +779,11 @@ chmod 600 ~/.ssh/authorized_keys
 ```
 
 What these commands do:
+
 - mkdir -p ~/.ssh -> creates the .ssh folder if it does not exist
 - chmod 700 ~/.ssh -> makes the folder private
 - touch ~/.ssh/authorized_keys -> creates the authorized_keys file if it does not exist
 - chmod 600 ~/.ssh/authorized_keys -> makes the file private
-
 
 Step 4: Add the public key to authorized_keys
 
@@ -803,12 +800,12 @@ cat ~/.ssh/id_ed25519.pub
 ```
 
 Save and exit:
+
 - Ctrl + O
 - Enter
 - Ctrl + X
 
-
-6) Get the public IP from CLI
+6. Get the public IP from CLI
 
 Option 1:
 
@@ -821,7 +818,6 @@ Option 2:
 ```bash
 curl https://api.ipify.org
 ```
-
 
 ## 7. How the GitHub Actions runner works for this project
 
@@ -849,14 +845,22 @@ GitHub provides the exact commands during runner setup in:
 
 **Repository Settings > Actions > Runners > New self-hosted runner**
 
-A typical Linux setup looks like this:
+For the current setup, the runner is being used from WSL and is currently located here:
 
 ```bash
-mkdir actions-runner && cd actions-runner
+/mnt/c/Users/user/actions-runner
+```
+
+A setup for this project would look like this:
+
+```bash
+cd /mnt/c/Users/user
+mkdir -p actions-runner
+cd actions-runner
 curl -o actions-runner-linux-x64-2.333.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.333.0/actions-runner-linux-x64-2.333.0.tar.gz
 echo "<published-sha256-checksum>  actions-runner-linux-x64-2.333.0.tar.gz" | shasum -a 256 -c
 tar xzf ./actions-runner-linux-x64-2.333.0.tar.gz
-./config.sh --url https://github.com/username/<project-name> --token <generated-registration-token>
+./config.sh --url https://github.com/ras-dec19/FastAPI-Project --token <generated-registration-token>
 ./run.sh
 ```
 
@@ -864,17 +868,43 @@ tar xzf ./actions-runner-linux-x64-2.333.0.tar.gz
 
 - `./config.sh` registers the runner with your repository
 - `./run.sh` starts the runner manually in the current shell session
+- in this setup, running `cd actions-runner` worked because the runner folder is under `/mnt/c/Users/user/`, not under `~/actions-runner`
 - the download URL, version, and registration token are generated by GitHub during setup and may change over time
-- if you want the runner to start automatically with the machine, you can install it as a service after configuration
+- right now, the runner is not installed as a service yet, which is why you have to start it manually with `./run.sh`
+- if you want the runner to start automatically when the WSL Ubuntu environment starts, you can install it as a service after configuration
 
 ### Optional service-based startup
 
 If you install the runner as a Linux service, you can manage it with:
 
 ```bash
+cd /mnt/c/Users/user/actions-runner
 sudo ./svc.sh install
 sudo ./svc.sh start
 sudo ./svc.sh status
+```
+
+### WSL note
+
+You only need to add the following if `systemctl` is not working in your WSL Ubuntu environment. If `systemctl` already works, you do not need to add this.
+
+If `systemctl` is not working, fix WSL first:
+
+```bash
+sudo nano /etc/wsl.conf
+```
+
+Put in:
+
+```ini
+[boot]
+systemd=true
+```
+
+Then from Windows PowerShell:
+
+```powershell
+wsl.exe --shutdown
 ```
 
 For this project, the important point is that the deploy job runs on the self-hosted runner machine itself, so no SSH step is needed for deployment to that same machine.
@@ -905,6 +935,7 @@ docker-compose*.yml
 gunicorn.service
 nginx.conf
 ```
+
 ---
 
 ## 15. Notes
@@ -915,4 +946,3 @@ nginx.conf
 - Use `postgres` when the Python process runs inside Docker Compose.
 - Use `DIRECT_DATABASE_URL` for Neon migrations when available.
 - Prefer a separate test database for `pytest`.
-

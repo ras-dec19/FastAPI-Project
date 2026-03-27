@@ -3,14 +3,14 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
 
-###################################################################################################
+####################################################################################################
 connect_args = {}
 
 # Only pass sslmode when not using a direct URL that already contains it
 if settings.database_sslmode:
     connect_args["sslmode"] = settings.database_sslmode
 
-###################################################################################################
+####################################################################################################
 engine = create_engine(
     settings.app_database_url,
     pool_pre_ping=True,
